@@ -4,37 +4,35 @@ import ReactDOM from 'react-dom';
 class App extends Component {
   constructor() {
     super();
-    this.state = { a: '', b: '' };
-    this.update = this.update.bind(this);
+    this.state = {increasing: false}
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({increasing: this.props.val < nextProps.val})
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.val % 5 === 0;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log(`prevProps: ${prevProps.val}`);
   }
 
   update() {
-    this.setState({
-      a: this.a.refs.input.value,
-      b: this.refs.b.value
-    })
+    ReactDOM.render(<App val={this.props.val+1} />, document.getElementById('root'));
   }
 
   render() {
-    return (
-      <div>
-        <Input 
-          ref={component => this.a = component} 
-          update={this.update} 
-        />
-        <span>{this.state.a}</span>
-        <hr />
-        <input ref="b" type="text" onChange={this.update} />
-        <span>{this.state.b}</span>
-      </div>
+    console.log(this.state.increasing);
+    return(
+      <button onClick={this.update.bind(this)}>
+        {this.props.val}
+      </button>
     )
   }
 }
 
-class Input extends Component {
-  render() {
-    return <input type="text" ref="input" onChange={this.props.update} />
-  }
-}
+App.defaultProps = { val: 0}
 
 export default App;
