@@ -1,39 +1,38 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 
-class App extends Component {
+const HOC = (InnerComponent) => class extends Component {
   constructor() {
     super();
-    this.state = {items: []}
   }
-
-  componentWillMount() {
-    fetch('https://swapi.co/api/people/?format=json')
-      .then(response => response.json())
-      .then(({results:items}) => this.setState({items}))
-  }
-
-  filter(e) {
-    this.setState({filter: e.target.value});
-  }
-
   render() {
-    let items = this.state.items
-    if(this.state.filter) {
-      items = items.filter(
-        item => item.name.toLowerCase()
-        .includes(this.state.filter.toLowerCase())
-      )
-    }
     return(
+      <InnerComponent {...this.props} />
+    )
+  }
+}
+
+class App extends Component {
+  render() {
+    return (
       <div>
-        <input type="text" onChange={this.filter.bind(this)} />
-        {items.map((item, i) => <h4 key={i}>{item.name}</h4>)}
+        <Button>button</Button>
+        <hr />
+        <LabelHOC>label</LabelHOC>
       </div>
     )
   }
 }
 
-App.defaultProps = { val: 0}
+const Button = HOC((props) => <button>{props.children}</button>)
+
+class Label extends Component {
+  render(){
+    return(
+      <label>{this.props.children}</label>
+    )
+  }
+}
+
+const LabelHOC = HOC(Label);
 
 export default App;
