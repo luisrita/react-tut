@@ -4,31 +4,32 @@ import ReactDOM from 'react-dom';
 class App extends Component {
   constructor() {
     super();
-    this.state = {increasing: false}
+    this.state = {items: []}
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({increasing: this.props.val < nextProps.val})
+  componentWillMount() {
+    fetch('https://swapi.co/api/people/?format=json')
+      .then(response => response.json())
+      .then(({results:items}) => this.setState({items}))
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.val % 5 === 0;
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    console.log(`prevProps: ${prevProps.val}`);
-  }
-
-  update() {
-    ReactDOM.render(<App val={this.props.val+1} />, document.getElementById('root'));
+  filter(e) {
+    this.setState({filter: e.target.value});
   }
 
   render() {
-    console.log(this.state.increasing);
+    let items = this.state.items
+    if(this.state.filter) {
+      items = items.filter(
+        item => item.name.toLowerCase()
+        .includes(this.state.filter.toLowerCase())
+      )
+    }
     return(
-      <button onClick={this.update.bind(this)}>
-        {this.props.val}
-      </button>
+      <div>
+        <input type="text" onChange={this.filter.bind(this)} />
+        {items.map((item, i) => <h4 key={i}>{item.name}</h4>)}
+      </div>
     )
   }
 }
