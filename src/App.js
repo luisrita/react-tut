@@ -1,38 +1,42 @@
 import React, { Component } from 'react';
 
-const HOC = (InnerComponent) => class extends Component {
-  constructor() {
-    super();
-  }
+class App extends Component {
   render() {
     return(
-      <InnerComponent {...this.props} />
+      <Buttons>
+        <button value="A">A</button>
+        <button value="B">B</button>
+        <button value="C">C</button>
+      </Buttons>
     )
   }
 }
 
-class App extends Component {
+class Buttons extends Component {
+  constructor() {
+    super();
+    this.state={selected: 'None'}
+  }
+
+  selectItem(selected) {
+    this.setState({selected})
+  }
+
   render() {
-    return (
+    let { selected } = this.state;
+    let fn = child => 
+      React.cloneElement(child, {
+        onClick: this.selectItem.bind(this, child.props.value)
+      })
+    let items = React.Children.map(this.props.children, fn);
+
+    return(
       <div>
-        <Button>button</Button>
-        <hr />
-        <LabelHOC>label</LabelHOC>
+        <h2>You have selected: {selected}</h2>
+        {items}
       </div>
     )
   }
 }
-
-const Button = HOC((props) => <button>{props.children}</button>)
-
-class Label extends Component {
-  render(){
-    return(
-      <label>{this.props.children}</label>
-    )
-  }
-}
-
-const LabelHOC = HOC(Label);
 
 export default App;
